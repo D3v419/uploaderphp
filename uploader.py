@@ -1,38 +1,27 @@
 import requests
-import os
 
-def upload_file(website, filename, filepath):
-    """Mengunggah file ke situs web.
+def upload_file(website, file_name, file_content):
+    # Buat URL untuk upload
+    upload_url = f"http://{website}/upload.php"
 
-    Args:
-        website: Alamat situs web (contoh: "http://example.com").
-        filename: Nama file yang akan diunggah (contoh: "shell.php").
-        filepath: Path lengkap ke file yang akan diunggah.
-    """
+    # Buat payload untuk upload
+    files = {
+        'file': (file_name, file_content, 'application/x-php')
+    }
 
-    try:
-        with open(filepath, "rb") as f:
-            files = {"file": (filename, f)}
-            response = requests.post(f"{website}/path/to/upload/script.php", files=files)
+    # Kirim permintaan POST ke server
+    response = requests.post(upload_url, files=files)
 
-            if response.status_code == 200:
-                print(f"Berhasil mengunggah {filename} ke {website}")
-                print(f"Link: {website}/path/to/uploaded/{filename}")
-            else:
-                print(f"Gagal mengunggah {filename} ke {website}")
-                print(response.text)
-
-    except FileNotFoundError:
-        print(f"File {filepath} tidak ditemukan.")
-    except requests.exceptions.RequestException as e:
-        print(f"Terjadi kesalahan saat menghubungi {website}: {e}")
-
-if __name__ == "__main__":
-    website = input("Masukkan alamat situs web: ")
-    filename = input("Masukkan nama file PHP: ")
-    filepath = input("Masukkan path lengkap ke file PHP: ")
-
-    if not os.path.exists(filepath):
-        print(f"File {filepath} tidak ditemukan.")
+    # Cek status kode respons
+    if response.status_code == 200:
+        print(f"File {file_name} berhasil diupload ke {website}")
+        print(f"Link untuk melihat file: http://{website}/{file_name}")
     else:
-        upload_file(website, filename, filepath)
+        print(f"Gagal mengupload file. Status kode: {response.status_code}")
+
+# Contoh penggunaan
+website = input("Masukkan nama website (contoh: example.com): ")
+file_name = input("Masukkan nama file PHP (contoh: shell.php): ")
+file_content = input("Masukkan konten file PHP (contoh: <?php echo 'Hello, World!'; ?>): ")
+
+upload_file(website, file_name, file_content)
